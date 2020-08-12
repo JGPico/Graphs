@@ -7,7 +7,8 @@ class Graph:
             self.vertices[vertex] = set()
 
     def add_edge(self, v1, v2):
-        self.vertices[v1].add(v2)
+        if v1 in self.vertices and v2 in self.vertices:
+            self.vertices[v1].add(v2)
 
     def get_neighbors(self, vertex):
         return self.vertices[vertex]
@@ -36,6 +37,9 @@ def build_graph(ancestors):
 
         graph.add_vertex(parent)
         graph.add_vertex(child)
+        # graph.add_edge(child, parent)
+
+    for parent, child in ancestors:
         graph.add_edge(child, parent)
 
     return graph
@@ -52,12 +56,15 @@ def earliest_ancestor(ancestors, starting_node):
 
     longest_path = []
 
+    earliest_ancestor = -1
+
     while s.size() > 0:
         path = s.pop()
         current_node = path[-1]
 
-        if len(path) > len(longest_path):
-            longest_path = list(path)
+        if len(path) > len(longest_path) and current_node < earliest_ancestor or len(path) > len(longest_path):
+            earliest_ancestor = current_node
+            longest_path = path
 
         if current_node not in visited:
             visited.add(current_node)
@@ -68,4 +75,11 @@ def earliest_ancestor(ancestors, starting_node):
                 new_path = path + [parent]
                 s.push(new_path)
 
+    # return earliest_ancestor
     return longest_path[-1]
+
+
+test_ancestors = [(1, 3), (2, 3), (3, 6), (5, 6), (5, 7),
+                  (4, 5), (4, 8), (8, 9), (11, 8), (10, 1)]
+
+print(earliest_ancestor(test_ancestors, 2))
